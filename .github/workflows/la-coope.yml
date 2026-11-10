@@ -1,0 +1,61 @@
+      - name: Consultar datos oficiales de Amateur A
+        run: python scripts/actualizar_fcf.py --solo-amateur
+      - name: Conservar feed y diagnostico para la proxima actualizacion
+        shell: bash
+        run: |
+          set -eu
+          git config user.name 'LA COOPE Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add site/feed.json site/diagnostico.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'LA COOPE: guardar datos y diagnostico FCF [skip ci]'
+            git push origin HEAD:main
+          fi
+      - name: Preparar GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Empaquetar web movil
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - name: Publicar web
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Configurar URL de la web en Android
+        if: github.event_name != 'schedule'
+        shell: bash
+        env:
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          mkdir -p app/src/main/assets
+          OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+          REPO_NAME="${REPOSITORY#*/}"
+          printf 'https://%s.github.io/%s/\n' "$OWNER" "$REPO_NAME" > app/src/main/assets/site-url.txt
+          cat app/src/main/assets/site-url.txt
+      - name: Preparar Java 17
+        if: github.event_name != 'schedule'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Preparar herramientas Android
+        if: github.event_name != 'schedule'
+        uses: android-actions/setup-android@v3
+      - name: Instalar SDK Android
+        if: github.event_name != 'schedule'
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Preparar Gradle
+        if: github.event_name != 'schedule'
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.12'
+      - name: Compilar APK V11.1
+        if: github.event_name != 'schedule'
+        run: gradle --no-daemon assembleDebug
+      - name: Publicar APK descargable
+        if: github.event_name != 'schedule'
+        uses: actions/upload-artifact@v4
+        with:
+          name: LA_COOPE_V11_1_APK
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
