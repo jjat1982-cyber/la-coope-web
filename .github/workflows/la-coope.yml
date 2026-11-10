@@ -102,9 +102,6 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Preparar herramientas Android
-        if: github.event_name != 'schedule'
-        uses: android-actions/setup-android@v3
       - name: Instalar SDK Android
         if: github.event_name != 'schedule'
         run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
