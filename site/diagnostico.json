@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-11-10T07:30:21+00:00",
+  "fcfReachable": true,
+  "pagesRead": 1,
+  "browserRenders": 1,
+  "teamsWithData": 0,
+  "verifiedSeason": "2026/27",
+  "errors": [
+    "https://www.fcf.cat/resultats/2627/futbol-11/primera-catalana/grup-3: 410 Client Error: Gone for url: https://www.fcf.cat/resultats/2627/futbol-11/primera-catalana/grup-3"
+  ],
+  "note": "Si fcfReachable es falso, comprobar conectividad, rutas oficiales y permisos del sitio. No se inventan resultados."
+}
